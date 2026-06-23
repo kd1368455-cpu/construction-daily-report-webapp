@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>作業日報入力システム</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --primary: #1f6feb;
+      --primary-light: #d0e2ff;
+      --bg: #f5f5f7;
+      --border: #d0d7de;
+      --text-main: #24292f;
+      --text-sub: #57606a;
+      --danger: #d73a49;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text-main);
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 24px auto;
+      padding: 16px;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      color: var(--text-sub);
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+      border-left: 4px solid var(--primary);
+      padding-left: 8px;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / 3;
+    }
+
+    label {
+      font-size: 0.9rem;
+      color: var(--text-sub);
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="number"],
+    textarea {
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      padding: 6px 8px;
+      font-size: 0.95rem;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    input:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-light);
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    input[type="range"] {
+      flex: 1;
+    }
+
+    .slider-value {
+      min-width: 40px;
+      text-align: right;
+      font-size: 0.9rem;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    button {
+      border-radius: 4px;
+      border: 1px solid transparent;
+      padding: 6px 12px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: #fff;
+      color: var(--text-main);
+      border-color: var(--border);
+    }
+
+    .btn-danger {
+      background: #fff;
+      color: var(--danger);
+      border-color: var(--danger);
+    }
+
+    .btn-primary:hover {
+      background: #1158c7;
+    }
+
+    .btn-secondary:hover {
+      background: #f6f8fa;
+    }
+
+    .btn-danger:hover {
+      background: #ffebeb;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 6px 8px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f6f8fa;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .empty-message {
+      font-size: 0.9rem;
+      color: var(--text-sub);
+      padding: 8px 0;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    @media (max-width: 720px) {
+      form {
+        grid-template-columns: 1fr;
+      }
+      .form-group.full {
+        grid-column: 1 / 2;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>作業日報入力システム</h1>
+    <div class="subtitle">
+      建設現場向けの日報入力を想定した、HTML＋JavaScriptのポートフォリオ用Webアプリです。
+    </div>
+
+    <div class="card">
+      <div class="card-title">日報入力フォーム</div>
+      <form id="reportForm">
+        <div class="form-group">
+          <label for="date">日付</label>
+          <input type="date" id="date" required>
+        </div>
+
+        <div class="form-group">
+          <label for="site">現場名</label>
+          <input type="text" id="site" placeholder="例：神戸本社ビル新築工事" required>
+        </div>
+
+        <div class="form-group">
+          <label for="hours">作業時間（時間）</label>
+          <input type="number" id="hours" min="0" step="0.5" placeholder="例：7.5" required>
+        </div>
+
+        <div class="form-group">
+          <label>進捗率</label>
+          <div class="slider-row">
+            <input type="range" id="progress" min="0" max="100" value="0">
+            <div class="slider-value" id="progressValue">0%</div>
+          </div>
+        </div>
+
+        <div class="form-group full">
+          <label for="work">作業内容</label>
+          <textarea id="work" placeholder="例：鉄骨建方3階部分、ボルト本締め、仮設足場点検など" required></textarea>
+        </div>
+
+        <div class="btn-row">
+          <button type="submit" class="btn-primary">日報を保存</button>
+          <button type="button" id="clearForm" class="btn-secondary">入力をクリア</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="card-title">日報一覧</div>
+      <div class="btn-row" style="margin-bottom: 8px;">
+        <button type="button" id="clearAll" class="btn-danger">すべての日報を削除</button>
+      </div>
+      <div class="table-wrapper">
+        <table id="reportTable">
+          <thead>
+            <tr>
+              <th>日付</th>
+              <th>現場名</th>
+              <th>作業内容</th>
+              <th>作業時間</th>
+              <th>進捗率</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="reportTbody">
+          </tbody>
+        </table>
+      </div>
+      <div id="emptyMessage" class="empty-message">
+        保存されている日報はまだありません。
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'construction_daily_reports';
+
+    const form = document.getElementById('reportForm');
+    const dateInput = document.getElementById('date');
+    const siteInput = document.getElementById('site');
+    const hoursInput = document.getElementById('hours');
+    const workInput = document.getElementById('work');
+    const progressInput = document.getElementById('progress');
+    const progressValue = document.getElementById('progressValue');
+    const clearFormBtn = document.getElementById('clearForm');
+    const clearAllBtn = document.getElementById('clearAll');
+    const tbody = document.getElementById('reportTbody');
+    const emptyMessage = document.getElementById('emptyMessage');
+
+    function loadReports() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return [];
+      try {
+        return JSON.parse(raw);
+      } catch {
+        return [];
+      }
+    }
+
+    function saveReports(reports) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(reports));
+    }
+
+    function renderReports() {
+      const reports = loadReports();
+      tbody.innerHTML = '';
+
+      if (reports.length === 0) {
+        emptyMessage.style.display = 'block';
+        return;
+      }
+
+      emptyMessage.style.display = 'none';
+
+      reports.forEach((report, index) => {
+        const tr = document.createElement('tr');
+
+        const tdDate = document.createElement('td');
+        tdDate.textContent = report.date;
+
+        const tdSite = document.createElement('td');
+        tdSite.textContent = report.site;
+
+        const tdWork = document.createElement('td');
+        tdWork.textContent = report.work;
+
+        const tdHours = document.createElement('td');
+        tdHours.textContent = report.hours + ' 時間';
+
+        const tdProgress = document.createElement('td');
+        const badge = document.createElement('span');
+        badge.className = 'badge';
+        badge.textContent = report.progress + '%';
+        tdProgress.appendChild(badge);
+
+        const tdActions = document.createElement('td');
+        const delBtn = document.createElement('button');
+        delBtn.textContent = '削除';
+        delBtn.className = 'btn-danger';
+        delBtn.addEventListener('click', () => {
+          deleteReport(index);
+        });
+        tdActions.appendChild(delBtn);
+
+        tr.appendChild(tdDate);
+        tr.appendChild(tdSite);
+        tr.appendChild(tdWork);
+        tr.appendChild(tdHours);
+        tr.appendChild(tdProgress);
+        tr.appendChild(tdActions);
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function deleteReport(index) {
+      const reports = loadReports();
+      reports.splice(index, 1);
+      saveReports(reports);
+      renderReports();
+    }
+
+    function clearAllReports() {
+      if (!confirm('本当にすべての日報を削除しますか？')) return;
+      localStorage.removeItem(STORAGE_KEY);
+      renderReports();
+    }
+
+    function clearForm() {
+      dateInput.value = '';
+      siteInput.value = '';
+      hoursInput.value = '';
+      workInput.value = '';
+      progressInput.value = 0;
+      progressValue.textContent = '0%';
+    }
+
+    progressInput.addEventListener('input', () => {
+      progressValue.textContent = progressInput.value + '%';
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      if (!dateInput.value || !siteInput.value || !hoursInput.value || !workInput.value) {
+        alert('すべての必須項目を入力してください。');
+        return;
+      }
+
+      const hours = parseFloat(hoursInput.value);
+      if (isNaN(hours) || hours < 0) {
+        alert('作業時間には0以上の数値を入力してください。');
+        return;
+      }
+
+      const newReport = {
+        date: dateInput.value,
+        site: siteInput.value.trim(),
+        hours: hours,
+        work: workInput.value.trim(),
+        progress: parseInt(progressInput.value, 10)
+      };
+
+      const reports = loadReports();
+      reports.push(newReport);
+      saveReports(reports);
+      renderReports();
+      clearForm();
+    });
+
+    clearFormBtn.addEventListener('click', clearForm);
+    clearAllBtn.addEventListener('click', clearAllReports);
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (!dateInput.value) {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        dateInput.value = `${yyyy}-${mm}-${dd}`;
+      }
+      renderReports();
+    });
+  </script>
+</body>
+</html>
